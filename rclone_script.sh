@@ -8,6 +8,8 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 UNDERLINE=$(tput smul)
 
+# include common helpers file
+source ./rclone_script-common.sh
 
 # include settings file
 config=~/scripts/rclone_script/rclone_script.ini
@@ -26,39 +28,6 @@ command="$5"
 ####################
 # HELPER FUNCTIONS #
 ####################
-
-function log ()
-# Prints messages of different severeties to a logfile
-# Each message will look something like this:
-# <TIMESTAMP>	<SEVERITY>	<CALLING_FUNCTION>	<MESSAGE>
-# needs a set variable $logLevel
-#	-1 > No logging at all
-#	0 > prints ERRORS only
-#	1 > prints ERRORS and WARNINGS
-#	2 > prints ERRORS, WARNINGS and INFO
-#	3 > prints ERRORS, WARNINGS, INFO and DEBUGGING
-# needs a set variable $log pointing to a file
-# Usage
-# log 0 "This is an ERROR Message"
-# log 1 "This is a WARNING"
-# log 2 "This is just an INFO"
-# log 3 "This is a DEBUG message"
-{
-	severity=$1
-	message=$2
-	
-	if (( ${severity} <= ${logLevel} ))
-	then
-		case ${severity} in
-			0) level="ERROR"  ;;
-			1) level="WARNING"  ;;
-			2) level="INFO"  ;;
-			3) level="DEBUG"  ;;
-		esac
-		
-		printf "$(date +%FT%T%:z):\t${level}\t${0##*/}\t${FUNCNAME[1]}\t${message}\n" >> ${logfile} 
-	fi
-}
 
 function killOtherNotification ()
 {

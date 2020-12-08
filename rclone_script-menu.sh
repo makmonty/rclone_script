@@ -1,23 +1,12 @@
 #!/bin/bash
 
-
-NORMAL="\Zn"
-BLACK="\Z0"
-RED="\Z1"
-GREEN="\Z2"
-YELLOW="\Z3\Zb"
-BLUE="\Z4"
-MAGENTA="\Z5"
-CYAN="\Z6"
-WHITE="\Z7"
-BOLD="\Zb"
-REVERSE="\Zr"
-UNDERLINE="\Zu"
-
+# include common helpers file
+source ./rclone_script-common.sh
 
 # include settings file
 config=~/scripts/rclone_script/rclone_script.ini
 source ${config}
+logLevel=2
 
 backtitle="RCLONE_SCRIPT menu (https://github.com/Jandalf81/rclone_script)"
 
@@ -25,13 +14,6 @@ backtitle="RCLONE_SCRIPT menu (https://github.com/Jandalf81/rclone_script)"
 ####################
 # HELPER FUNCTIONS #
 ####################
-
-function log ()
-{
-	severity=$1
-	message=$2
-	printf "$(date +%FT%T%:z):\t${severity}:\t${message}\n" >> ${logfile}
-}
 
 function getTypeOfRemote ()
 {
