@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # global variables
-repo="makmonty/rclone_script"
-url="https://raw.githubusercontent.com/${repo}"
+repo="https://github.com/makmonty/rclone_script.git"
 branch="master"
 path=~/scripts/rclone_script
+setup_script=${path}/rclone_script-setup.sh
 
 if ! command -v git &> /dev/null
 then
 	sudo apt-get install git
 fi
 
-git clone https://github.com/${repo}.git ${path}
+git clone ${repo} ${path}
 
-$path/rclone_script-setups.sh
+$setup_script
