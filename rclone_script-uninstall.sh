@@ -4,12 +4,12 @@ currDir=`realpath $(dirname $0)`
 
 # include common helpers file
 source ${currDir}/rclone_script-common.sh
+source ${currDir}/rclone_script.ini
 
 backtitle="RCLONE_SCRIPT uninstaller (https://github.com/Jandalf81/rclone_script)"
 logfile=${currDir}/rclone_script-uninstall.log
 logLevel=2
 
-source ${currDir}/rclone_script.ini
 oldRemote=""
 
 
@@ -216,7 +216,6 @@ function 1RCLONE ()
 	log 2 "START"
 	
 # 1a. Remove RCLONE configuration
-	log 2 "START"
 	updateStep "1a" "in progress" 0
 	
 	if [ -d ~/.config/rclone ]

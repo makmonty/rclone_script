@@ -18,7 +18,6 @@ config=~/scripts/rclone_script/rclone_script.ini
 source ${config}
 logLevel=2
 
-
 # parameters
 direction="$1"
 system="$2"
