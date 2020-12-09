@@ -836,7 +836,7 @@ function 6LocalSAVEFILEDirectory ()
 			1) updateStep "6b" "created" 80  ;;
 		esac
 	else
-		updateStep "6b" "skipped" 80  ;;
+		updateStep "6b" "skipped" 80
 	fi
 }
 
@@ -943,7 +943,7 @@ function 7RemoteSAVEFILEDirectory ()
 			255) updateStep "7b" "failed" 85  ;;
 		esac
 	else
-		updateStep "7b" "skipped" 90 ;;
+		updateStep "7b" "skipped" 90
 	fi
 }
 
