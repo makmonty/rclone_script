@@ -1,10 +1,12 @@
 #!/bin/bash
 
+currDir=`realpath $(dirname $0)`
+
 # include common helpers file
-source ./rclone_script-common.sh
+source ${currDir}/rclone_script-common.sh
 
 # include settings file
-config=~/scripts/rclone_script/rclone_script.ini
+config=${currDir}/rclone_script.ini
 source ${config}
 logLevel=2
 
@@ -54,7 +56,7 @@ function saveConfig ()
 	echo "remotebasedir=${remotebasedir}" > ${config}
 	echo "showNotifications=${showNotifications}" >> ${config}
 	echo "syncOnStartStop=${syncOnStartStop}" >> ${config}
-	echo "logfile=~/scripts/rclone_script/rclone_script.log" >> ${config}
+	echo "logfile=${currDir}/rclone_script.log" >> ${config}
 	echo "neededConnection=${neededConnection}" >> ${config}
 	echo "debug=0" >> ${config}
 }
@@ -93,7 +95,7 @@ function main_menu ()
 			2) toggleSyncOnStartStop  ;;
 			3) toggleShowNotifications  ;;
 			4) setNeededConnection ;;
-			9) ~/scripts/rclone_script/rclone_script-uninstall.sh  ;;
+			9) ${currDir}/rclone_script-uninstall.sh  ;;
 			*) break  ;;
 		esac
 	done
@@ -102,7 +104,7 @@ function main_menu ()
 # Syncs all files in both directions, only transferring newer files
 function doFullSync ()
 {
-	local tmpfile=~/scripts/rclone_script/tmp-sync.txt
+	local tmpfile=${currDir}/tmp-sync.txt
 	
 	getTypeOfRemote
 	printf "\nStarted full sync...\n\n" > ${tmpfile}

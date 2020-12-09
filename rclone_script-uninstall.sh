@@ -1,13 +1,15 @@
 #!/bin/bash
 
+currDir=`realpath $(dirname $0)`
+
 # include common helpers file
-source ./rclone_script-common.sh
+source ${currDir}/rclone_script-common.sh
 
 backtitle="RCLONE_SCRIPT uninstaller (https://github.com/Jandalf81/rclone_script)"
-logfile=~/scripts/rclone_script/rclone_script-uninstall.log
+logfile=${currDir}/rclone_script-uninstall.log
 logLevel=2
 
-source ~/scripts/rclone_script/rclone_script.ini
+source ${currDir}/rclone_script.ini
 oldRemote=""
 
 
@@ -319,11 +321,11 @@ function 4RCLONE_SCRIPT ()
 	log 2 "START"
 	updateStep "4a" "in progress" 32
 	
-	if [ -f ~/scripts/rclone_script/rclone_script.sh ]
+	if [ -f ${currDir}/rclone_script.sh ]
 	then
 		{ # try
-			sudo rm -f ~/scripts/rclone_script/rclone_script-install.* >> "${logfile}" &&
-			sudo rm -f ~/scripts/rclone_script/rclone_script.* >> "${logfile}" &&
+			sudo rm -f ${currDir}/rclone_script-install.* >> "${logfile}" &&
+			sudo rm -f ${currDir}/rclone_script.* >> "${logfile}" &&
 			log 2 "DONE" &&
 			updateStep "4a" "done" 40
 		} || { # catch
@@ -365,7 +367,7 @@ function 4RCLONE_SCRIPT ()
 		log 2 "FOUND"
 		
 		sudo rm ~/RetroPie/retropiemenu/rclone_script-redirect.sh >> "${logfile}"
-		sudo rm ~/scripts/rclone_script/rclone_script-menu.sh >> "${logfile}"
+		sudo rm ${currDir}/rclone_script-menu.sh >> "${logfile}"
 		
 		log 2 "REMOVED"
 	else
@@ -389,7 +391,7 @@ function 5RUNCOMMAND ()
 	log 2 "START"
 	updateStep "5a" "in progress" 48
 	
-	if [[ $(grep -c "~/scripts/rclone_script/rclone_script.sh" /opt/retropie/configs/all/runcommand-onstart.sh) -gt 0 ]]
+	if [[ $(grep -c "${currDir}/rclone_script.sh" /opt/retropie/configs/all/runcommand-onstart.sh) -gt 0 ]]
 	then
 	{ #try
 		sed -i "/~\/scripts\/rclone_script\/rclone_script.sh /d" /opt/retropie/configs/all/runcommand-onstart.sh &&
@@ -408,7 +410,7 @@ function 5RUNCOMMAND ()
 	log 2 "START"
 	updateStep "5b" "in progress" 56
 	
-	if [[ $(grep -c "~/scripts/rclone_script/rclone_script.sh" /opt/retropie/configs/all/runcommand-onend.sh) -gt 0 ]]
+	if [[ $(grep -c "${currDir}/rclone_script.sh" /opt/retropie/configs/all/runcommand-onend.sh) -gt 0 ]]
 	then
 		{ #try
 			sed -i "/~\/scripts\/rclone_script\/rclone_script.sh /d" /opt/retropie/configs/all/runcommand-onend.sh &&
@@ -585,10 +587,10 @@ function 8Finalize ()
 	log 2 "DONE"
 	
 	# move LOGFILE to HOME
-	mv ~/scripts/rclone_script/rclone_script-uninstall.log ~
+	mv ${currDir}/rclone_script-uninstall.log ~
 	
 	# remove RCLONE_SCRIPT directory
-	rm -rf ~/scripts/rclone_script
+	rm -rf ${currDir}
 }
 
 

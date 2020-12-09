@@ -1,7 +1,9 @@
 #!/bin/bash
 
+currDir=`realpath $(dirname $0)`
+
 # include common helpers file
-source ./rclone_script-common.sh
+source ${currDir}/rclone_script-common.sh
 
 repo="makmonty/rclone_script"
 
@@ -14,7 +16,7 @@ remotebasedir=""
 shownotifications=""
 
 backtitle="RCLONE_SCRIPT installer (https://github.com/${repo})"
-logfile=~/scripts/rclone_script/rclone_script-install.log
+logfile=${currDir}/rclone_script-install.log
 logLevel=2
 
 
@@ -28,7 +30,7 @@ dialog \
 	--no-collapse \
 	--cr-wrap \
 	--yesno \
-		"\nThis script will configure RetroPie so that your savefiles and statefiles will be ${YELLOW}synchronized with a remote destination${NORMAL}. Several packages and scripts will be installed, see\n\n	https://github.com/${repo}/blob/master/ReadMe.md\n\nfor a rundown. In short, any time you ${GREEN}start${NORMAL} or ${RED}stop${NORMAL} a ROM the savefiles and savestates for that ROM will be ${GREEN}down-${NORMAL} and ${RED}uploaded${NORMAL} ${GREEN}from${NORMAL} and ${RED}to${NORMAL} a remote destination. To do so, RetroPie will be configured to put all savefiles and statefiles in distinct directories, seperated from the ROMS directories. This installer will guide you through the necessary steps. If you wish to see what exactly is done at each step, open a second console and execute\n	${YELLOW}tail -f ~/scripts/rclone_script/rclone_script-install.log${NORMAL}\n\nIf you already have some savefiles in the ROMS directory, you will need to ${YELLOW}move them manually${NORMAL} after installation. You can use the new network share\n	${YELLOW}\\\\$(hostname)\\saves${NORMAL}\nfor this.\n\nAre you sure you wish to continue?" \
+		"\nThis script will configure RetroPie so that your savefiles and statefiles will be ${YELLOW}synchronized with a remote destination${NORMAL}. Several packages and scripts will be installed, see\n\n	https://github.com/${repo}/blob/master/ReadMe.md\n\nfor a rundown. In short, any time you ${GREEN}start${NORMAL} or ${RED}stop${NORMAL} a ROM the savefiles and savestates for that ROM will be ${GREEN}down-${NORMAL} and ${RED}uploaded${NORMAL} ${GREEN}from${NORMAL} and ${RED}to${NORMAL} a remote destination. To do so, RetroPie will be configured to put all savefiles and statefiles in distinct directories, seperated from the ROMS directories. This installer will guide you through the necessary steps. If you wish to see what exactly is done at each step, open a second console and execute\n	${YELLOW}tail -f ${currDir}/rclone_script-install.log${NORMAL}\n\nIf you already have some savefiles in the ROMS directory, you will need to ${YELLOW}move them manually${NORMAL} after installation. You can use the new network share\n	${YELLOW}\\\\$(hostname)\\saves${NORMAL}\nfor this.\n\nAre you sure you wish to continue?" \
 	26 90 2>&1 > /dev/tty \
     || exit
 
@@ -614,7 +616,7 @@ function 4aCreateRCLONE_SCRIPTMenuItem ()
 	log 2 "START"
 	
 	# create redirect script
-	printf "#!/bin/bash\n~/scripts/rclone_script/rclone_script-menu.sh" > ~/RetroPie/retropiemenu/rclone_script-redirect.sh
+	printf "#!/bin/bash\n${currDir}/rclone_script-menu.sh" > ~/RetroPie/retropiemenu/rclone_script-redirect.sh
 	chmod +x ~/RetroPie/retropiemenu/rclone_script-redirect.sh
 	
 	# check if menu item exists
@@ -729,7 +731,7 @@ function 5aRUNCOMMAND-ONSTART ()
 		log 2 "FILE FOUND"
 		
 		# check if there's a call to RCLONE_SCRIPT
-		if grep -Fq "~/scripts/rclone_script/rclone_script.sh" /opt/retropie/configs/all/runcommand-onstart.sh
+		if grep -Fq "${currDir}/rclone_script.sh" /opt/retropie/configs/all/runcommand-onstart.sh
 		then
 			log 2 "CALL FOUND"
 			
@@ -738,7 +740,7 @@ function 5aRUNCOMMAND-ONSTART ()
 			log 2 "CALL NOT FOUND"
 			
 			# add call
-			printf "\n~/scripts/rclone_script/rclone_script.sh \"down\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onstart.sh	
+			printf "\n${currDir}/rclone_script.sh \"down\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onstart.sh	
 
 			log 2 "CALL CREATED"
 			
@@ -747,7 +749,7 @@ function 5aRUNCOMMAND-ONSTART ()
 	else
 		log 2 "FILE NOT FOUND"
 	
-		printf "#!/bin/bash\n~/scripts/rclone_script/rclone_script.sh \"down\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" > /opt/retropie/configs/all/runcommand-onstart.sh
+		printf "#!/bin/bash\n${currDir}/rclone_script.sh \"down\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" > /opt/retropie/configs/all/runcommand-onstart.sh
 		
 		log 2 "FILE CREATED"
 		
@@ -769,7 +771,7 @@ function 5aRUNCOMMAND-ONEND ()
 		log 2 "FILE FOUND"
 		
 		# check if there's a call to RCLONE_SCRIPT
-		if grep -Fq "~/scripts/rclone_script/rclone_script.sh" /opt/retropie/configs/all/runcommand-onend.sh
+		if grep -Fq "${currDir}/rclone_script.sh" /opt/retropie/configs/all/runcommand-onend.sh
 		then
 			log 2 "CALL FOUND"
 			
@@ -778,7 +780,7 @@ function 5aRUNCOMMAND-ONEND ()
 			log 2 "CALL NOT FOUND"
 			
 			# add call
-			printf "\n~/scripts/rclone_script/rclone_script.sh \"up\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onend.sh	
+			printf "\n${currDir}/rclone_script.sh \"up\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onend.sh	
 
 			log 2 "CALL CREATED"
 			
@@ -787,7 +789,7 @@ function 5aRUNCOMMAND-ONEND ()
 	else
 		log 2 "FILE NOT FOUND"
 	
-		printf "#!/bin/bash\n~/scripts/rclone_script/rclone_script.sh \"up\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onend.sh
+		printf "#!/bin/bash\n${currDir}/rclone_script.sh \"up\" \"\$1\" \"\$2\" \"\$3\" \"\$4\"\n" >> /opt/retropie/configs/all/runcommand-onend.sh
 		
 		log 2 "FILE CREATED"
 		
@@ -991,11 +993,11 @@ function 7bCheckRemoteSystemDirectories ()
 				# put note if local directory is a symlink
 				if [ -L ~/RetroPie/saves/${system} ]
 				then
-					printf "ATTENTION\r\n\r\nThis directory will not be used! This is just a symlink.\r\nPlace your savefiles in\r\n\r\n$(readlink ~/RetroPie/roms/${system})\r\n\r\ninstead." > ~/scripts/rclone_script/readme.txt
+					printf "ATTENTION\r\n\r\nThis directory will not be used! This is just a symlink.\r\nPlace your savefiles in\r\n\r\n$(readlink ~/RetroPie/roms/${system})\r\n\r\ninstead." > ${currDir}/readme.txt
 					
-					rclone copy ~/scripts/rclone_script/readme.txt retropie:"${remotebasedir}/${system}/"
+					rclone copy ${currDir}/readme.txt retropie:"${remotebasedir}/${system}/"
 					
-					rm ~/scripts/rclone_script/readme.txt
+					rm ${currDir}/readme.txt
 				fi
 				
 				retval=1
@@ -1097,12 +1099,12 @@ function 9aSaveConfiguration ()
 {
 	log 2 "START"
 	
-	echo "remotebasedir=${remotebasedir}" > ~/scripts/rclone_script/rclone_script.ini
-	echo "showNotifications=${shownotifications}" >> ~/scripts/rclone_script/rclone_script.ini
-	echo "syncOnStartStop=\"TRUE\"" >> ~/scripts/rclone_script/rclone_script.ini
-	echo "logfile=~/scripts/rclone_script/rclone_script.log" >> ~/scripts/rclone_script/rclone_script.ini
-	echo "neededConnection=${neededConnection}" >> ~/scripts/rclone_script/rclone_script.ini
-	echo "debug=0" >> ~/scripts/rclone_script/rclone_script.ini
+	echo "remotebasedir=${remotebasedir}" > ${currDir}/rclone_script.ini
+	echo "showNotifications=${shownotifications}" >> ${currDir}/rclone_script.ini
+	echo "syncOnStartStop=\"TRUE\"" >> ${currDir}/rclone_script.ini
+	echo "logfile=${currDir}/rclone_script.log" >> ${currDir}/rclone_script.ini
+	echo "neededConnection=${neededConnection}" >> ${currDir}/rclone_script.ini
+	echo "debug=0" >> ${currDir}/rclone_script.ini
 	
 	log 2 "DONE"
 }
