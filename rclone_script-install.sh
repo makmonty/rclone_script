@@ -13,4 +13,4 @@ fi
 
 git clone https://github.com/${repo}.git ${path}
 
-$path/rclone_script-install.sh
+$path/rclone_script-setups.sh

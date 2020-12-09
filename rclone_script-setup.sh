@@ -144,22 +144,21 @@ function initSteps ()
 	steps[11]="	3a. Test for IMAGEMAGICK			[ waiting...  ]"
 	steps[12]="	3b. apt-get install IMAGEMAGICK			[ waiting...  ]"
 	steps[13]="4. RCLONE_SCRIPT"
-	steps[14]="	4a. Download RCLONE_SCRIPT files		[ waiting...  ]"
-	steps[15]="	4b. Create RCLONE_SCRIPT menu item		[ waiting...  ]"
-	steps[16]="	4c. Configure RCLONE_SCRIPT			[ waiting...  ]"
-	steps[17]="5. RUNCOMMAND"
-	steps[18]="	5a. Add call to RUNCOMMAND-ONSTART		[ waiting...  ]"
-	steps[19]="	5b. Add call to RUNCOMMAND-ONEND		[ waiting...  ]"
-	steps[20]="6. Local SAVEFILE directory"
-	steps[21]="	6a. Check local base directory			[ waiting...  ]"
-	steps[22]="	6b. Check local <SYSTEM> directories		[ waiting...  ]"
-	steps[23]="7. Remote SAVEFILE directory"
-	steps[24]="	7a. Check remote base directory			[ waiting...  ]"
-	steps[25]="	7b. Check remote <SYSTEM> directories		[ waiting...  ]"
-	steps[26]="8. Configure RETROARCH"
-	steps[27]="	8a. Set local SAVEFILE directories		[ waiting...  ]"
-	steps[28]="9. Finalizing"
-	steps[29]="	9a. Save configuration				[ waiting...  ]"
+	steps[14]="	4a. Create RCLONE_SCRIPT menu item		[ waiting...  ]"
+	steps[15]="	4b. Configure RCLONE_SCRIPT			[ waiting...  ]"
+	steps[16]="5. RUNCOMMAND"
+	steps[17]="	5a. Add call to RUNCOMMAND-ONSTART		[ waiting...  ]"
+	steps[18]="	5b. Add call to RUNCOMMAND-ONEND		[ waiting...  ]"
+	steps[19]="6. Local SAVEFILE directory"
+	steps[20]="	6a. Check local base directory			[ waiting...  ]"
+	steps[21]="	6b. Check local <SYSTEM> directories		[ waiting...  ]"
+	steps[22]="7. Remote SAVEFILE directory"
+	steps[23]="	7a. Check remote base directory			[ waiting...  ]"
+	steps[24]="	7b. Check remote <SYSTEM> directories		[ waiting...  ]"
+	steps[25]="8. Configure RETROARCH"
+	steps[26]="	8a. Set local SAVEFILE directories		[ waiting...  ]"
+	steps[27]="9. Finalizing"
+	steps[28]="	9a. Save configuration				[ waiting...  ]"
 }
 
 # Update item of $STEPS() and show updated progress dialog
@@ -586,78 +585,31 @@ function 3bInstallIMAGEMAGICK ()
 
 function 4RCLONE_SCRIPT ()
 {
-# 4a. Getting RCLONE_SCRIPT
-	updateStep "4a" "in progress" 45
+# 4a. Creating RCLONE_SCRIPT menu item
+	updateStep "4a" "in progress" 50
 	
-	4aGetRCLONE_SCRIPT
+	4aCreateRCLONE_SCRIPTMenuItem
 	if [[ $? -eq 0 ]]
 	then
-		updateStep "4a" "done" 50
+		updateStep "4a" "done" 55
 	else
-		updateStep "4a" "failed" 45
+		updateStep "4a" "failed" 50
 		exit
 	fi
 
-# 4b. Creating RCLONE_SCRIPT menu item
-	updateStep "4b" "in progress" 50
+# 4b. Configure RCLONE_SCRIPT
+	updateStep "4b" "in progress" 55
 	
-	4bCreateRCLONE_SCRIPTMenuItem
-	if [[ $? -eq 0 ]]
-	then
-		updateStep "4b" "done" 55
-	else
-		updateStep "4b" "failed" 50
-		exit
-	fi
-
-# 4c. Configure RCLONE_SCRIPT
-	updateStep "4c" "in progress" 55
+	4bConfigureRCLONE_SCRIPT
 	
-	4cConfigureRCLONE_SCRIPT
-	
-	updateStep "4c" "done" 60
-}
-
-# Gets RCLONE_SCRIPT
-# RETURN
-#	0 > downloaded successfully
-#	1 > errors while downloading
-function 4aGetRCLONE_SCRIPT ()
-{
-	log 2 "START"
-	
-	# create directory if necessary
-	if [ ! -d ~/scripts/rclone_script ]
-	then
-		mkdir ~/scripts/rclone_script >> "${logfile}"
-	fi
-	
-	{ #try
-		# get script files
-		wget -N -P ~/scripts/rclone_script ${url}/${branch}/rclone_script.sh --append-output="${logfile}" &&
-		wget -N -P ~/scripts/rclone_script ${url}/${branch}/rclone_script-menu.sh --append-output="${logfile}" &&
-		wget -N -P ~/scripts/rclone_script ${url}/${branch}/rclone_script-uninstall.sh --append-output="${logfile}" &&
-		
-		# change mod
-		chmod +x ~/scripts/rclone_script/rclone_script.sh >> "${logfile}" &&
-		chmod +x ~/scripts/rclone_script/rclone_script-menu.sh >> "${logfile}" &&
-		chmod +x ~/scripts/rclone_script/rclone_script-uninstall.sh >> "${logfile}" &&
-		
-		log 2 "DONE" &&
-		
-		return 0
-	} || { # catch
-		log 0 "ERROR" &&
-		
-		return 1
-	}
+	updateStep "4b" "done" 60
 }
 
 # Creates a menu item for RCLONE_SCRIPT in RetroPie menu
 # RETURN
 #	0 > menu item has been found or created
 #	1 > error while creating menu item
-function 4bCreateRCLONE_SCRIPTMenuItem ()
+function 4aCreateRCLONE_SCRIPTMenuItem ()
 {
 	log 2 "START"
 	
@@ -693,7 +645,7 @@ function 4bCreateRCLONE_SCRIPTMenuItem ()
 }
 
 # Gets user input to configure RCLONE_SCRIPT
-function 4cConfigureRCLONE_SCRIPT ()
+function 4bConfigureRCLONE_SCRIPT ()
 {
 	log 2 "START"
 	
