@@ -2,9 +2,8 @@
 
 # global variables
 repo="https://github.com/makmonty/rclone_script.git"
-branch="master"
 path=~/scripts/rclone_script
-setup_script=${path}/rclone_script-setup.sh
+setupScript=${path}/rclone_script-setup.sh
 
 if ! command -v git &> /dev/null
 then
@@ -13,4 +12,4 @@ fi
 
 git clone ${repo} ${path}
 
-$setup_script
+$setupScript

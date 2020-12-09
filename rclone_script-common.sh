@@ -14,6 +14,11 @@ BOLD="\Zb"
 REVERSE="\Zr"
 UNDERLINE="\Zu"
 
+repo="https://github.com/makmonty/rclone_script"
+
+currDir=`realpath $(dirname $0)`
+config=${currDir}/rclone_script.ini
+
 function log ()
 # Prints messages of different severeties to a logfile
 # Each message will look something like this:
@@ -93,4 +98,15 @@ function fileHasKeyWithValue ()
     else
         return 1
     fi
+}
+
+function saveConfiguration ()
+{
+	echo "remotebasedir=${remotebasedir}" > ${config}
+	echo "showNotifications=${showNotifications}" >> ${config}
+	echo "syncOnStartStop=${syncOnStartStop}" >> ${config}
+	echo "logfile=${currDir}/rclone_script.log" >> ${config}
+	echo "neededConnection=${neededConnection}" >> ${config}
+    echo "useSystemDirectories=${useSystemDirectories}" >> ${config}
+	echo "debug=0" >> ${config}
 }

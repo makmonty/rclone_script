@@ -6,7 +6,6 @@ currDir=`realpath $(dirname $0)`
 source ${currDir}/rclone_script-common.sh
 
 # include settings file
-config=${currDir}/rclone_script.ini
 source ${config}
 logLevel=2
 
@@ -50,17 +49,6 @@ function getStatusOfParameters ()
 		1) statusNeededConnection="LAN / WLAN" ;;
 	esac
 }
-
-function saveConfig ()
-{
-	echo "remotebasedir=${remotebasedir}" > ${config}
-	echo "showNotifications=${showNotifications}" >> ${config}
-	echo "syncOnStartStop=${syncOnStartStop}" >> ${config}
-	echo "logfile=${currDir}/rclone_script.log" >> ${config}
-	echo "neededConnection=${neededConnection}" >> ${config}
-	echo "debug=0" >> ${config}
-}
-
 
 ##################
 # MENU FUNCTIONS #
@@ -148,7 +136,7 @@ function toggleSyncOnStartStop ()
 		syncOnStartStop="TRUE"
 	fi
 	
-	saveConfig
+	saveConfiguration
 }
 
 function toggleShowNotifications ()
@@ -160,7 +148,7 @@ function toggleShowNotifications ()
 		showNotifications="TRUE"
 	fi
 	
-	saveConfig
+	saveConfiguration
 }
 
 function setNeededConnection ()
@@ -185,7 +173,7 @@ function setNeededConnection ()
 		*) return ;;
 	esac
 	
-	saveConfig
+	saveConfiguration
 }
 
 

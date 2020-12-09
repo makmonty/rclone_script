@@ -5,17 +5,16 @@ currDir=`realpath $(dirname $0)`
 # include common helpers file
 source ${currDir}/rclone_script-common.sh
 
-repo="makmonty/rclone_script"
-
 # global variables
-url="https://raw.githubusercontent.com/${repo}"
 branch="master"
 
 # configuration variables
 remotebasedir=""
-shownotifications=""
+showNotifications=""
+syncOnStartStop="TRUE"
+useSystemDirectories=""
 
-backtitle="RCLONE_SCRIPT installer (https://github.com/${repo})"
+backtitle="RCLONE_SCRIPT installer (${repo})"
 logfile=${currDir}/rclone_script-install.log
 logLevel=2
 
@@ -661,6 +660,24 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--title "Remote base directory" \
 		--inputbox "\nPlease name the directory which will be used as your ${YELLOW}remote base directory${NORMAL}. If necessary, this directory will be created.\n\nExamples:\n* RetroArch\n* mySaves/RetroArch\n\n" 18 40 "RetroArch" 
 		)
+	
+	dialog \
+		--stdout \
+		--colors \
+		--no-collapse \
+		--cr-wrap \
+		--no-cancel \
+		--backtitle "${backtitle}" \
+		--title "Use system directories"
+		--yesno "Do you want to use directories per system or put all the saves together"
+		--yes-label "Per system"
+		--no-label "All together"
+		
+	case $? in
+		0) useSystemDirectories="TRUE"  ;;
+		1) useSystemDirectories="FALSE"  ;;
+		*) useSystemDirectories="FALSE"  ;;
+	esac
 		
 	dialog \
 		--stdout \
@@ -672,9 +689,9 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--yesno "\nDo you wish to see ${YELLOW}notifications${NORMAL} whenever RCLONE_SCRIPT is synchronizing?" 18 40
 		
 	case $? in
-		0) shownotifications="TRUE"  ;;
-		1) shownotifications="FALSE"  ;;
-		*) shownotifications="FALSE"  ;;
+		0) showNotifications="TRUE"  ;;
+		1) showNotifications="FALSE"  ;;
+		*) showNotifications="FALSE"  ;;
 	esac
 	
 	choice=$(dialog \
@@ -811,11 +828,16 @@ function 6LocalSAVEFILEDirectory ()
 # 6b. Check local <SYSTEM> directories
 	updateStep "6b" "in progress" 75
 	
-	6bCheckLocalSystemDirectories
-	case $? in
-		0) updateStep "6b" "found" 80  ;;
-		1) updateStep "6b" "created" 80  ;;
-	esac
+	if [ "${useSystemDirectories}" == "TRUE" ]
+	then
+		6bCheckLocalSystemDirectories
+		case $? in
+			0) updateStep "6b" "found" 80  ;;
+			1) updateStep "6b" "created" 80  ;;
+		esac
+	else
+		updateStep "6b" "skipped" 80  ;;
+	fi
 }
 
 # Checks if the local base SAVEFILE directory exists
@@ -912,12 +934,17 @@ function 7RemoteSAVEFILEDirectory ()
 # 7b. Check remote <system> directories
 	updateStep "7b" "in progress" 85
 	
-	7bCheckRemoteSystemDirectories
-	case $? in
-		0) updateStep "7b" "found" 90  ;;
-		1) updateStep "7b" "created" 90  ;;
-		255) updateStep "7b" "failed" 85  ;;
-	esac
+	if [ "${useSystemDirectories}" == "TRUE" ]
+	then
+		7bCheckRemoteSystemDirectories
+		case $? in
+			0) updateStep "7b" "found" 90  ;;
+			1) updateStep "7b" "created" 90  ;;
+			255) updateStep "7b" "failed" 85  ;;
+		esac
+	else
+		updateStep "7b" "skipped" 90 ;;
+	fi
 }
 
 # Checks if the remote base SAVEFILE directory exists
@@ -1023,63 +1050,70 @@ function 8ConfigureRETROARCH ()
 	updateStep "8a" "done" 95
 }
 
-# Sets parameters in all system specific configuration files
+# Sets parameters in all system specific configuration files or the common config file
 function 8aSetLocalSAVEFILEDirectory ()
 {
 	log 2 "START"
 	
 	local retval
 	
-	# for each directory...
-	for directory in /opt/retropie/configs/*
-	do
-		system="${directory##*/}"
-		
-		# skip directory ALL
-		if [ "${system}" = "all" ]
-		then
-			continue
-		fi
-		
-		# test if there's a RETROARCH.CFG
-		if [ -f "${directory}/retroarch.cfg" ]
-		then
-			log 2 "FOUND retroarch.cfg FOR ${system}"
+	if [ "${useSystemDirectories}" == "TRUE" ]
+	then
+		log 2 "Setting save directories per system in config files"
+		# for each directory...
+		for directory in /opt/retropie/configs/*
+		do
+			system="${directory##*/}"
 			
-			# test file for SAVEFILE_DIRECTORY
-			retval=$(grep -i "^savefile_directory = " ${directory}/retroarch.cfg)
-		
-			if [ ! "${retval}" = "" ]
+			# skip directory ALL
+			if [ "${system}" = "all" ]
 			then
-				log 2 "REPLACED savefile_directory"
-			
-				# replace existing parameter
-				setKeyValueInFile "savefile_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
-			else
-				log 2 "ADDED savefile_directory"
-				
-				# create new parameter above "#include..."
-				sed -i "/^#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"/c\savefile_directory = \"~\/RetroPie\/saves\/${system}\"\n#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"" ${directory}/retroarch.cfg
+				continue
 			fi
 			
-			# test file for SAVESTATE_DIRECTORY
-			retval=$(grep -i "^savestate_directory = " ${directory}/retroarch.cfg)
-		
-			if [ ! "${retval}" = "" ]
+			# test if there's a RETROARCH.CFG
+			if [ -f "${directory}/retroarch.cfg" ]
 			then
-				log 2 "REPLACED savestate_directory"
+				log 2 "FOUND retroarch.cfg FOR ${system}"
 				
-				# replace existing parameter
-				setKeyValueInFile "savestate_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
-			else
-				log 2 "ADDED savestate_directory"
+				# test file for SAVEFILE_DIRECTORY
+				retval=$(grep -i "^savefile_directory = " ${directory}/retroarch.cfg)
 			
-				# create new parameter above "#include..."
-				sed -i "/^#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"/c\savestate_directory = \"~\/RetroPie\/saves\/${system}\"\n#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"" ${directory}/retroarch.cfg
+				if [ ! "${retval}" = "" ]
+				then
+					log 2 "REPLACED savefile_directory"
+				
+					# replace existing parameter
+					setKeyValueInFile "savefile_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
+				else
+					log 2 "ADDED savefile_directory"
+					
+					# create new parameter above "#include..."
+					sed -i "/^#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"/c\savefile_directory = \"~\/RetroPie\/saves\/${system}\"\n#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"" ${directory}/retroarch.cfg
+				fi
+				
+				# test file for SAVESTATE_DIRECTORY
+				retval=$(grep -i "^savestate_directory = " ${directory}/retroarch.cfg)
+			
+				if [ ! "${retval}" = "" ]
+				then
+					log 2 "REPLACED savestate_directory"
+					
+					# replace existing parameter
+					setKeyValueInFile "savestate_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
+				else
+					log 2 "ADDED savestate_directory"
+				
+					# create new parameter above "#include..."
+					sed -i "/^#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"/c\savestate_directory = \"~\/RetroPie\/saves\/${system}\"\n#include \"\/opt\/retropie\/configs\/all\/retroarch.cfg\"" ${directory}/retroarch.cfg
+				fi
+				
 			fi
-			
-		fi
-	done
+		done
+	else
+		log 2 "Setting save directory in retroarch.cfg"
+		setKeyValueInFile "savestate_directory" "~/RetroPie/saves" "/opt/retropie/configs/all/retroarch.cfg"
+	fi
 	
 	log 2 "DONE"
 }
@@ -1099,12 +1133,7 @@ function 9aSaveConfiguration ()
 {
 	log 2 "START"
 	
-	echo "remotebasedir=${remotebasedir}" > ${currDir}/rclone_script.ini
-	echo "showNotifications=${shownotifications}" >> ${currDir}/rclone_script.ini
-	echo "syncOnStartStop=\"TRUE\"" >> ${currDir}/rclone_script.ini
-	echo "logfile=${currDir}/rclone_script.log" >> ${currDir}/rclone_script.ini
-	echo "neededConnection=${neededConnection}" >> ${currDir}/rclone_script.ini
-	echo "debug=0" >> ${currDir}/rclone_script.ini
+	saveConfiguration
 	
 	log 2 "DONE"
 }
