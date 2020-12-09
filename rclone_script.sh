@@ -1,5 +1,7 @@
 #!/bin/bash
 
+currDir=`realpath $(dirname $0)`
+
 # define colors for output
 NORMAL=$(tput sgr0)
 RED=$(tput setaf 1)
@@ -9,7 +11,7 @@ BLUE=$(tput setaf 4)
 UNDERLINE=$(tput smul)
 
 # include common helpers file
-source ./rclone_script-common.sh
+source ${currDir}/rclone_script-common.sh
 
 # include settings file
 config=~/scripts/rclone_script/rclone_script.ini
