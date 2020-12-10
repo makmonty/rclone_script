@@ -435,10 +435,10 @@ function 6LocalSAVEFILEDirectory ()
 	log 2 "START"
 	updateStep "6a" "in progress" 64
 	
-	if [ -d ~/RetroPie/saves ]
+	if [ -d ${localbasedir} ]
 	then
 		# start copy task in background, pipe numbered output into COPY.TXT and to LOGFILE
-		$(cp -v -r ~/RetroPie/saves/* ~/RetroPie/roms | cat -n | tee copy.txt | cat >> "${logfile}") &
+		$(cp -v -r ${localbasedir}/* ~/RetroPie/roms | cat -n | tee copy.txt | cat >> "${logfile}") &
 		
 		# show content of COPY.TXT
 		dialog \
@@ -463,10 +463,10 @@ function 6LocalSAVEFILEDirectory ()
 	log 2 "START"
 	updateStep "6b" "in progress" 72
 	
-	if [ -d ~/RetroPie/saves ]
+	if [ -d ${localbasedir} ]
 	then
 		# start remove task in background, pipe numbered output into DELETE.TXT and to LOGFILE
-		$(sudo rm --recursive --force --verbose ~/RetroPie/saves | cat -n | tee delete.txt | cat >> "${logfile}") &
+		$(sudo rm --recursive --force --verbose ${localbasedir} | cat -n | tee delete.txt | cat >> "${logfile}") &
 		
 		# show content of REMOVE.TXT
 		dialog \
@@ -535,8 +535,8 @@ function 7RetroArch ()
 		then
 			log 2 "FOUND retroarch.cfg for ${system}"
 			
-			# check if RETROARCH.CFG contains SAVEFILE pointing to ~/RetroPie/saves/<SYSTEM>
-			if fileHasKeyWithValue "savefile_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg";
+			# check if RETROARCH.CFG contains SAVEFILE pointing to ${localbasedir}/<SYSTEM>
+			if fileHasKeyWithValue "savefile_directory" "${localbasedir}/${system}" "${directory}/retroarch.cfg";
 			then
 				log 2 "FOUND savefile_directory"
 				found=$(($found + 1))
@@ -547,8 +547,8 @@ function 7RetroArch ()
 				log 2 "NOT FOUND savefile_directory"
 			fi
 			
-			# check if RETROARCH.CFG contains SAVESTATE pointing to ~/RetroPie/saves/<SYSTEM>
-			if fileHasKeyWithValue "savestate_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg";
+			# check if RETROARCH.CFG contains SAVESTATE pointing to ${localbasedir}/<SYSTEM>
+			if fileHasKeyWithValue "savestate_directory" "${localbasedir}/${system}" "${directory}/retroarch.cfg";
 			then
 				log 2 "FOUND savestate_directory"
 				found=$(($found + 1))
