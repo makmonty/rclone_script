@@ -269,7 +269,7 @@ function 2PNGVIEW ()
 	then
 		{ #try
 			sudo rm /usr/bin/pngview >> "${logfile}" &&
-			sudo rm /usr/lib/libraspidmx.so.1 >> "${logfile}" &&
+			# sudo rm /usr/lib/libraspidmx.so.1 >> "${logfile}" &&
 			log 2 "DONE" &&
 			updateStep "2a" "done" 24
 		} || { # catch
