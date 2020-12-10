@@ -25,6 +25,14 @@ emulator="$3"
 rom="$4"
 command="$5"
 
+if [ "${useSystemDirectories}" == "TRUE" ]
+then
+	remotePath=${remotebasedir}/${system}
+	localPath=~/Retropie/saves/${system}
+else
+	remotePath=${remotebasedir}
+	localPath=~/Retropie/saves
+fi
 
 ####################
 # HELPER FUNCTIONS #
@@ -189,7 +197,7 @@ function downloadSaves ()
 	fi
 	
 	# test for remote files
-	remotefiles=$(rclone lsf retropie:${remotebasedir}/${system} --include "${filter}.*")
+	remotefiles=$(rclone lsf retropie:${remotePath} --include "${filter}.*")
 	retval=$?
 	
 	if [ "${retval}" = "0" ]
@@ -203,7 +211,7 @@ function downloadSaves ()
 			log 2 "Found remote files"
 			
 			# download saves and states to corresponding ROM
-			rclone copy retropie:${remotebasedir}/${system} ~/RetroPie/saves/${system} --include "${filter}.*" --update >> ${logfile}
+			rclone copy retropie:${remotePath} ${localPath} --include "${filter}.*" --update >> ${logfile}
 			retval=$?
 			
 			if [ "${retval}" = "0" ]
@@ -247,7 +255,7 @@ function uploadSaves ()
 		return
 	fi
 
-	localfiles=$(find ~/RetroPie/saves/${system} -type f -iname "${filter}.*")
+	localfiles=$(find ${localPath} -type f -iname "${filter}.*")
 	
 	if [ "${localfiles}" = "" ]
 	then # no local files found
@@ -255,7 +263,7 @@ function uploadSaves ()
 		showNotification "Uploading saves and states to ${remoteType}... No local files found"
 	else # local files found
 		# upload saves and states to corresponding ROM
-		rclone copy ~/RetroPie/saves/${system} retropie:${remotebasedir}/${system} --include "${filter}.*" --update >> ${logfile}
+		rclone copy ${localPath} retropie:${remotePath} --include "${filter}.*" --update >> ${logfile}
 		retval=$?
 		
 		if [ "${retval}" = "0" ]
