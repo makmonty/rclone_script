@@ -668,11 +668,10 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--cr-wrap \
 		--no-cancel \
 		--backtitle "${backtitle}" \
-		--title "Use system directories" \
-		--yesno "Do you want to use directories per system or put all the saves together" \
+		--title "Directory strategy" \
 		--yes-label "Per system" \
 		--no-label "All together" \
-		18 40
+		--yesno "Do you want to use directories per system or put all the saves together" 8 40
 		
 	case $? in
 		0) useSystemDirectories="TRUE"  ;;
