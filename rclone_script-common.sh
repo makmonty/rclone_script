@@ -103,6 +103,7 @@ function fileHasKeyWithValue ()
 function saveConfiguration ()
 {
 	echo "remotebasedir=${remotebasedir}" > ${config}
+    echo "localbasedir=${localbasedir}" > ${config}
 	echo "showNotifications=${showNotifications}" >> ${config}
 	echo "syncOnStartStop=${syncOnStartStop}" >> ${config}
 	echo "logfile=${currDir}/rclone_script.log" >> ${config}

@@ -10,6 +10,7 @@ branch="master"
 
 # configuration variables
 remotebasedir=""
+localbasedir=~/RetroPie/saves
 showNotifications=""
 syncOnStartStop="TRUE"
 useSystemDirectories=""
@@ -113,7 +114,7 @@ function dialogShowSummary ()
 		--no-collapse \
 		--cr-wrap \
 		--yesno \
-			"\n${GREEN}All done!${NORMAL}\n\nFrom now on, all your saves and states will be synchronized each time you start or stop a ROM.\n\nAll systems will put their saves and states in\n	Local: \"${YELLOW}~/RetroPie/saves/<SYSTEM>${NORMAL}\"\n	Remote: \"${YELLOW}retropie:${remotebasedir}/<SYSTEM>${NORMAL}\" (${remoteType})\nIf you already have some saves in the ROM directories, you need to move them there manually now!  You can use the new network share\n	${YELLOW}\\\\$(hostname)\\saves${NORMAL}\nfor this. Afterward, you should ${red}reboot${NORMAL} your RetroPie. Then, you should start a full sync via\n	${YELLOW}RetroPie / RCLONE_SCRIPT menu / 1 Full sync${NORMAL}\n\nStart\n	${YELLOW}RetroPie / RCLONE_SCRIPT menu / 9 uninstall${NORMAL}\nto revert all changes and remove this script.\n\nTo finish the installer you should reboot your RetroPie now.\n\n${RED}Reboot RetroPie now?${NORMAL}" \
+			"\n${GREEN}All done!${NORMAL}\n\nFrom now on, all your saves and states will be synchronized each time you start or stop a ROM.\n\nAll systems will put their saves and states in\n	Local: \"${YELLOW}${localbasedir}/<SYSTEM>${NORMAL}\"\n	Remote: \"${YELLOW}retropie:${remotebasedir}/<SYSTEM>${NORMAL}\" (${remoteType})\nIf you already have some saves in the ROM directories, you need to move them there manually now!  You can use the new network share\n	${YELLOW}\\\\$(hostname)\\saves${NORMAL}\nfor this. Afterward, you should ${red}reboot${NORMAL} your RetroPie. Then, you should start a full sync via\n	${YELLOW}RetroPie / RCLONE_SCRIPT menu / 1 Full sync${NORMAL}\n\nStart\n	${YELLOW}RetroPie / RCLONE_SCRIPT menu / 9 uninstall${NORMAL}\nto revert all changes and remove this script.\n\nTo finish the installer you should reboot your RetroPie now.\n\n${RED}Reboot RetroPie now?${NORMAL}" \
 		28 90 2>&1 > /dev/tty
 	
 	case $? in
@@ -849,7 +850,7 @@ function 6aCheckLocalBaseDirectory ()
 	log 2 "START"
 	
 	# check if local base dir exists
-	if [ -d ~/RetroPie/saves ]
+	if [ -d ${localbasedir} ]
 	then
 		log 2 "FOUND"
 		
@@ -857,7 +858,7 @@ function 6aCheckLocalBaseDirectory ()
 	else
 		log 2 "NOT FOUND"
 		
-		mkdir ~/RetroPie/saves
+		mkdir ${localbasedir}
 		log 2 "CREATED directory"
 		
 		# share that new directory on the network
@@ -894,21 +895,21 @@ function 6bCheckLocalSystemDirectories ()
 		if [ ! -L ~/RetroPie/roms/${system} ]
 		then
 			# check if same directory exists in SAVES, create if necessary
-			if [ -d ~/RetroPie/saves/${system} ] 
+			if [ -d ${localbasedir}/${system} ] 
 			then
 				log 2 "FOUND directory ${system}"
 			else
-				mkdir ~/RetroPie/saves/${system}
+				mkdir ${localbasedir}/${system}
 				log 2 "CREATED directory ${system}"
 				retval=1
 			fi
 		else
 			# check if same SymLink exists in SAVES, create if necessary
-			if [ -L ~/RetroPie/saves/${system} ]
+			if [ -L ${localbasedir}/${system} ]
 			then
 				log 2 "FOUND symlink ${system}"
 			else
-				ln -s $(readlink ~/RetroPie/roms/${system}) ~/RetroPie/saves/${system}
+				ln -s $(readlink ~/RetroPie/roms/${system}) ${localbasedir}/${system}
 				
 				log 2 "CREATED symlink ${system}"
 				retval=1
@@ -1018,7 +1019,7 @@ function 7bCheckRemoteSystemDirectories ()
 				log 2 "CREATED ${system}"
 				
 				# put note if local directory is a symlink
-				if [ -L ~/RetroPie/saves/${system} ]
+				if [ -L ${localbasedir}/${system} ]
 				then
 					printf "ATTENTION\r\n\r\nThis directory will not be used! This is just a symlink.\r\nPlace your savefiles in\r\n\r\n$(readlink ~/RetroPie/roms/${system})\r\n\r\ninstead." > ${currDir}/readme.txt
 					
@@ -1084,7 +1085,7 @@ function 8aSetLocalSAVEFILEDirectory ()
 					log 2 "REPLACED savefile_directory"
 				
 					# replace existing parameter
-					setKeyValueInFile "savefile_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
+					setKeyValueInFile "savefile_directory" "${localbasedir}/${system}" "${directory}/retroarch.cfg"
 				else
 					log 2 "ADDED savefile_directory"
 					
@@ -1100,7 +1101,7 @@ function 8aSetLocalSAVEFILEDirectory ()
 					log 2 "REPLACED savestate_directory"
 					
 					# replace existing parameter
-					setKeyValueInFile "savestate_directory" "~/RetroPie/saves/${system}" "${directory}/retroarch.cfg"
+					setKeyValueInFile "savestate_directory" "${localbasedir}/${system}" "${directory}/retroarch.cfg"
 				else
 					log 2 "ADDED savestate_directory"
 				
@@ -1112,7 +1113,7 @@ function 8aSetLocalSAVEFILEDirectory ()
 		done
 	else
 		log 2 "Setting save directory in retroarch.cfg"
-		setKeyValueInFile "savestate_directory" "~/RetroPie/saves" "/opt/retropie/configs/all/retroarch.cfg"
+		setKeyValueInFile "savestate_directory" "${localbasedir}" "/opt/retropie/configs/all/retroarch.cfg"
 	fi
 	
 	log 2 "DONE"

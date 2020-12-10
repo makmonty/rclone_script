@@ -28,10 +28,10 @@ command="$5"
 if [ "${useSystemDirectories}" == "TRUE" ]
 then
 	remotePath=${remotebasedir}/${system}
-	localPath=~/RetroPie/saves/${system}
+	localPath=${localbasedir}/${system}
 else
 	remotePath=${remotebasedir}
-	localPath=~/RetroPie/saves
+	localPath=${localbasedir}
 fi
 
 ####################
