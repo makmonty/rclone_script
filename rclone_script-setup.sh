@@ -676,7 +676,6 @@ function 4bConfigureRCLONE_SCRIPT ()
 		
 	case $? in
 		0) useSystemDirectories="TRUE"  ;;
-		1) useSystemDirectories="FALSE"  ;;
 		*) useSystemDirectories="FALSE"  ;;
 	esac
 		
@@ -691,7 +690,6 @@ function 4bConfigureRCLONE_SCRIPT ()
 		
 	case $? in
 		0) showNotifications="TRUE"  ;;
-		1) showNotifications="FALSE"  ;;
 		*) showNotifications="FALSE"  ;;
 	esac
 	
@@ -1114,6 +1112,49 @@ function 8aSetLocalSAVEFILEDirectory ()
 	else
 		log 2 "Setting save directory in retroarch.cfg"
 		setKeyValueInFile "savestate_directory" "${localbasedir}" "/opt/retropie/configs/all/retroarch.cfg"
+
+
+		log 2 "Removing save directory from system-specific retroarch.cfg"
+		# for each directory...
+		for directory in /opt/retropie/configs/*
+		do
+			system="${directory##*/}"
+			
+			# skip directory ALL
+			if [ "${system}" = "all" ]
+			then
+				continue
+			fi
+			
+			# test if there's a RETROARCH.CFG
+			if [ -f "${directory}/retroarch.cfg" ]
+			then
+				log 2 "FOUND retroarch.cfg FOR ${system}"
+				
+				# test file for SAVEFILE_DIRECTORY
+				retval=$(grep -i "^savefile_directory = " ${directory}/retroarch.cfg)
+			
+				if [ ! "${retval}" = "" ]
+				then
+					log 2 "REMOVED savefile_directory"
+				
+					# remove existing parameter
+					removeKeyFromFile "savefile_directory" "${directory}/retroarch.cfg"
+				fi
+				
+				# test file for SAVESTATE_DIRECTORY
+				retval=$(grep -i "^savestate_directory = " ${directory}/retroarch.cfg)
+			
+				if [ ! "${retval}" = "" ]
+				then
+					log 2 "REMOVED savestate_directory"
+					
+					# remove existing parameter
+					removeKeyFromFile "savestate_directory" "${directory}/retroarch.cfg"
+				fi
+				
+			fi
+		done
 	fi
 	
 	log 2 "DONE"
