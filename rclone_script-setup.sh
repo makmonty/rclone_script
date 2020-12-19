@@ -711,7 +711,7 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--title "Needed connection" \
 		--ok-label "Select" \
 		--no-cancel \
-		--default-item $neededConnection
+		--default-item $neededConnection \
 		--menu "\nPlease select which type of connection will be needed for your configured remote" 20 50 5 \
 			0 "Internet access" \
 			1 "LAN / WLAN connection only"
