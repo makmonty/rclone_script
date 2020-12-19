@@ -8,17 +8,20 @@ source ${currDir}/rclone_script-common.sh
 # global variables
 branch="master"
 
-# configuration variables
-remotebasedir=""
+# default configuration variables
+remotebasedir=RetroArch
 localbasedir=~/RetroPie/saves
-showNotifications=""
+showNotifications="TRUE"
 syncOnStartStop="TRUE"
-useSystemDirectories=""
+useSystemDirectories="TRUE"
+neededConnection="0"
 
 backtitle="RCLONE_SCRIPT installer (${repo})"
 logfile=${currDir}/rclone_script-install.log
 logLevel=2
 
+# include already saved configuration
+source ${config}
 
 ##################
 # WELCOME DIALOG #
@@ -659,15 +662,18 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--no-cancel \
 		--backtitle "${backtitle}" \
 		--title "Remote base directory" \
-		--inputbox "\nPlease name the directory which will be used as your ${YELLOW}remote base directory${NORMAL}. If necessary, this directory will be created.\n\nExamples:\n* RetroArch\n* mySaves/RetroArch\n\n" 18 40 "RetroArch" 
+		--inputbox "\nPlease name the directory which will be used as your ${YELLOW}remote base directory${NORMAL}. If necessary, this directory will be created.\n\nExamples:\n* RetroArch\n* mySaves/RetroArch\n\n" 18 40 $remotebasedir 
 		)
 	
+	local selectedUseSystemDirectories=$([ "$useSystemDirectories" == "FALSE" ] && echo "--defaultno" || echo "")
+
 	dialog \
 		--stdout \
 		--colors \
 		--no-collapse \
 		--cr-wrap \
 		--no-cancel \
+		${selectedUseSystemDirectories}
 		--backtitle "${backtitle}" \
 		--title "Directory strategy" \
 		--yes-label "Per system" \
@@ -678,12 +684,15 @@ function 4bConfigureRCLONE_SCRIPT ()
 		0) useSystemDirectories="TRUE"  ;;
 		*) useSystemDirectories="FALSE"  ;;
 	esac
-		
+	
+	local selectedShowNotifications=$([ "$showNotifications" == "FALSE" ] && echo "--defaultno" || echo "")
+
 	dialog \
 		--stdout \
 		--colors \
 		--no-collapse \
 		--cr-wrap \
+		${selectedShowNotifications} \
 		--backtitle "${backtitle}" \
 		--title "Notifications" \
 		--yesno "\nDo you wish to see ${YELLOW}notifications${NORMAL} whenever RCLONE_SCRIPT is synchronizing?" 18 40
@@ -692,7 +701,7 @@ function 4bConfigureRCLONE_SCRIPT ()
 		0) showNotifications="TRUE"  ;;
 		*) showNotifications="FALSE"  ;;
 	esac
-	
+
 	choice=$(dialog \
 		--stdout \
 		--colors \
@@ -702,6 +711,7 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--title "Needed connection" \
 		--ok-label "Select" \
 		--no-cancel \
+		--default-item $neededConnection
 		--menu "\nPlease select which type of connection will be needed for your configured remote" 20 50 5 \
 			0 "Internet access" \
 			1 "LAN / WLAN connection only"

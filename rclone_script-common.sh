@@ -106,8 +106,8 @@ function saveConfiguration ()
     echo "localbasedir=${localbasedir}" >> ${config}
 	echo "showNotifications=${showNotifications}" >> ${config}
 	echo "syncOnStartStop=${syncOnStartStop}" >> ${config}
-	echo "logfile=${currDir}/rclone_script.log" >> ${config}
 	echo "neededConnection=${neededConnection}" >> ${config}
     echo "useSystemDirectories=${useSystemDirectories}" >> ${config}
+	echo "logfile=${currDir}/rclone_script.log" >> ${config}
 	echo "debug=0" >> ${config}
 }
