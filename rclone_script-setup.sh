@@ -673,7 +673,7 @@ function 4bConfigureRCLONE_SCRIPT ()
 		--no-collapse \
 		--cr-wrap \
 		--no-cancel \
-		${selectedUseSystemDirectories}
+		${selectedUseSystemDirectories} \
 		--backtitle "${backtitle}" \
 		--title "Directory strategy" \
 		--yes-label "Per system" \
